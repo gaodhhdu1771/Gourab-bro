@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gourab Bro | Premium Full Stack Developer</title>
+  <meta name="description" content="Gourab Bro - Full Stack Developer. Futuristic 3D Portfolio. Request custom websites with logo, features & live admin tracking." />
+  <link rel="icon" href="https://i.postimg.cc/wjNKn4My/IMG-0228.avif" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    :root {
+      --bg: #030308;
+      --bg2: #0a0a18;
+      --card: rgba(12, 12, 30, 0.75);
+      --border: rgba(0, 245, 255, 0.12);
+      --cyan: #00f5ff;
+      --purple: #c084fc;
+      --pink: #f472b6;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --glow: 0 0 25px rgba(0, 245, 255, 0.35);
+    }
+    [data-theme="light"] {
+      --bg: #f1f5f9;
+      --bg2: #e2e8f0;
+      --card: rgba(255, 255, 255, 0.9);
+      --border: rgba(99, 102, 241, 0.18);
+      --text: #0f172a;
+      --muted: #475569;
+      --glow: 0 0 20px rgba(99, 102, 241, 0.25);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+    }
+    .custom-cursor {
+      width: 18px; height: 18px;
+      border: 2px solid var(--cyan);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: difference;
+    }
+    .custom-cursor.hover {
+      width: 48px; height: 48px;
+      background: rgba(0, 245, 255, 0.12);
+    }
+    .cursor-dot {
+      width: 5px; height: 5px;
+      background: var(--cyan);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 100000;
+      transform: translate(-50%, -50%);
+    }
+    #canvas-bg {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1; opacity: 0.55;
+    }
+    .noise {
+      position: fixed; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.025; pointer-events: none; z-index: 1;
+    }
+    #intro {
+      position: fixed; inset: 0;
+      background: #000;
+      z-index: 100000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.9s, visibility 0.9s;
+    }
+    #intro.hide { opacity: 0; visibility: hidden; }
+    .intro-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.2rem, 9vw, 4.8rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #00f5ff 0%, #c084fc 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 6px;
+      animation: pulseGlow 2.2s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 12px #00f5ff); }
+      50% { filter: drop-shadow(0 0 35px #c084fc); }
+    }
+    .intro-bar {
+      width: 220px; height: 3px;
+      background: rgba(255,255,255,0.08);
+      margin-top: 32px; border-radius: 10px; overflow: hidden;
+    }
+    .intro-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #00f5ff, #c084fc, #f472b6);
+      animation: loadBar 2.4s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @keyframes loadBar { to { width: 100%; } }
+    .intro-text {
+      margin-top: 18px; font-size: 0.85rem;
+      color: #64748b; letter-spacing: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+      text-transform: uppercase;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      padding: 16px 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(24px);
+      background: rgba(3, 3, 8, 0.65);
+      border-bottom: 1px solid var(--border);
+    }
+    [data-theme="light"] nav { background: rgba(241, 245, 249, 0.8); }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800; font-size: 1.35rem;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 26px; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.88rem; font-weight: 500;
+      transition: color 0.3s; position: relative;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--cyan); }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -5px; left: 0;
+      width: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      transition: width 0.3s;
+    }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+    .theme-btn, .auth-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px; border-radius: 50px;
+      cursor: none; font-size: 0.82rem; font-weight: 500;
+      transition: all 0.3s;
+    }
+    .theme-btn:hover, .auth-btn:hover {
+      border-color: var(--cyan);
+      box-shadow: var(--glow);
+      color: var(--cyan);
+    }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: none; padding: 6px; }
+    .hamburger span { width: 22px; height: 2px; background: var(--cyan); border-radius: 2px; }
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 130px 5% 90px;
+      position: relative;
+      gap: 40px;
+    }
+    .hero-content { max-width: 580px; z-index: 2; flex: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(0, 245, 255, 0.08);
+      border: 1px solid rgba(0, 245, 255, 0.25);
+      padding: 7px 18px; border-radius: 50px;
+      font-size: 0.78rem; color: var(--cyan);
+      margin-bottom: 28px;
+      animation: fadeUp 0.8s ease;
+    }
+    .hero-badge .dot {
+      width: 8px; height: 8px; background: #00f5ff;
+      border-radius: 50%; animation: blink 1.6s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px #00f5ff; }
+      50% { opacity: 0.4; }
+    }
+    .hero h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.6rem, 6.5vw, 4.4rem);
+      font-weight: 900; line-height: 1.12;
+      margin-bottom: 14px;
+      animation: fadeUp 0.8s 0.1s both;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #00f5ff, #c084fc, #f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-role {
+      font-size: 1.25rem; color: var(--muted);
+      margin-bottom: 22px; font-weight: 500;
+      animation: fadeUp 0.8s 0.2s both;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .hero-desc {
+      color: var(--muted); line-height: 1.75;
+      margin-bottom: 36px; max-width: 500px;
+      font-size: 1.02rem;
+      animation: fadeUp 0.8s 0.3s both;
+    }
+    .hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.4s both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00f5ff, #a855f7);
+      color: #030308; font-weight: 700;
+      padding: 15px 30px; border-radius: 50px;
+      border: none; cursor: none;
+      font-size: 0.95rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0, 245, 255, 0.45);
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 15px 28px; border-radius: 50px;
+      cursor: none; font-size: 0.95rem; font-weight: 500;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    .btn-secondary:hover {
+      border-color: var(--cyan);
+      box-shadow: var(--glow);
+      color: var(--cyan);
+    }
+    .hero-image {
+      flex: 0 0 auto;
+      width: min(400px, 38vw);
+      z-index: 1;
+      position: relative;
+    }
+    .hero-img-wrapper {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      background: linear-gradient(var(--bg), var(--bg)) padding-box,
+                  linear-gradient(135deg, #00f5ff, #c084fc, #f472b6) border-box;
+      box-shadow: 0 0 70px rgba(0, 245, 255, 0.18);
+      animation: float 7s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-18px); }
+    }
+    .hero-img-wrapper img {
+      width: 100%; display: block;
+      object-fit: cover; aspect-ratio: 1;
+    }
+    .hero-img-glow {
+      position: absolute; inset: -30px;
+      background: radial-gradient(circle, rgba(0,245,255,0.18), transparent 65%);
+      z-index: -1; filter: blur(40px);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    section { padding: 100px 5%; position: relative; }
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.9rem, 4vw, 2.9rem);
+      font-weight: 800;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .section-title span {
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted);
+      margin-bottom: 55px; font-size: 1.05rem;
+      max-width: 560px; margin-left: auto; margin-right: auto;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 50px; align-items: center;
+      max-width: 1150px; margin: 0 auto;
+    }
+    .about-photos {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+      height: 480px;
+    }
+    .about-photos img {
+      width: 100%; height: 100%;
+      border-radius: 18px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      transition: transform 0.45s, box-shadow 0.45s;
+    }
+    .about-photos img:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 30px rgba(0, 245, 255, 0.25);
+      z-index: 2;
+    }
+    .about-photos img:nth-child(1) { grid-row: 1 / 3; }
+    .about-text h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.55rem; margin-bottom: 18px;
+      color: var(--cyan);
+    }
+    .about-text p {
+      color: var(--muted); line-height: 1.85;
+      margin-bottom: 16px; font-size: 1.02rem;
+    }
+    .stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-top: 32px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 12px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      transition: 0.3s;
+    }
+    .stat-card:hover { border-color: var(--cyan); box-shadow: var(--glow); }
+    .stat-card .num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.9rem; font-weight: 800;
+      color: var(--cyan);
+    }
+    .stat-card .label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 18px; max-width: 1050px; margin: 0 auto;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 26px 14px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      transition: all 0.4s;
+      cursor: none;
+    }
+    .skill-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--cyan);
+      box-shadow: var(--glow);
+    }
+    .skill-icon { font-size: 2.1rem; margin-bottom: 10px; }
+    .skill-name { font-weight: 600; font-size: 0.92rem; }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 26px; max-width: 1200px; margin: 0 auto;
+    }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px; overflow: hidden;
+      backdrop-filter: blur(12px);
+      transition: all 0.4s;
+    }
+    .project-card:hover {
+      transform: translateY(-12px);
+      border-color: var(--cyan);
+      box-shadow: 0 25px 50px rgba(0, 245, 255, 0.12);
+    }
+    .project-img {
+      height: 190px; overflow: hidden;
+      background: linear-gradient(135deg, #0f172a, #1e1b4b);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .project-img img { width: 100%; height: 100%; object-fit: cover; }
+    .project-body { padding: 22px; }
+    .project-body h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.15rem; margin-bottom: 8px;
+    }
+    .project-body p {
+      color: var(--muted); font-size: 0.9rem;
+      line-height: 1.65; margin-bottom: 14px;
+    }
+    .project-tags {
+      display: flex; flex-wrap: wrap; gap: 7px;
+      margin-bottom: 14px;
+    }
+    .tag {
+      background: rgba(0, 245, 255, 0.1);
+      color: var(--cyan); font-size: 0.72rem;
+      padding: 4px 11px; border-radius: 50px;
+      font-weight: 500;
+    }
+    .project-links a {
+      color: var(--cyan); font-size: 0.85rem;
+      text-decoration: none; font-weight: 600;
+    }
+    .request-section {
+      background: linear-gradient(180deg, transparent, rgba(0, 245, 255, 0.025), transparent);
+    }
+    .request-card {
+      max-width: 720px; margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 28px; padding: 40px 36px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .request-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem; text-align: center;
+      margin-bottom: 8px;
+    }
+    .request-card .sub {
+      text-align: center; color: var(--muted);
+      margin-bottom: 32px; font-size: 0.95rem;
+    }
+    .form-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 16px;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 0.82rem;
+      color: var(--muted); margin-bottom: 7px; font-weight: 500;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 13px 16px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text);
+      font-size: 0.93rem; outline: none;
+      transition: border 0.3s, box-shadow 0.3s;
+      font-family: inherit;
+    }
+    [data-theme="light"] .form-group input,
+    [data-theme="light"] .form-group select,
+    [data-theme="light"] .form-group textarea {
+      background: rgba(255,255,255,0.7);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.12);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+    .checkbox-group {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;
+    }
+    .checkbox-item {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      padding: 9px 14px; border-radius: 50px;
+      font-size: 0.82rem; cursor: none;
+      transition: 0.25s;
+    }
+    .checkbox-item:hover, .checkbox-item.active {
+      border-color: var(--cyan);
+      background: rgba(0, 245, 255, 0.1);
+      color: var(--cyan);
+    }
+    .checkbox-item input { display: none; }
+    .logo-upload {
+      border: 2px dashed var(--border);
+      border-radius: 16px; padding: 28px;
+      text-align: center; cursor: none;
+      transition: 0.3s;
+      background: rgba(0,0,0,0.2);
+    }
+    .logo-upload:hover { border-color: var(--cyan); }
+    .logo-upload input { display: none; }
+    .logo-preview {
+      max-width: 120px; max-height: 80px;
+      margin: 12px auto 0; border-radius: 10px;
+      display: none;
+    }
+    .social-grid {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 14px; margin-bottom: 50px;
+    }
+    .social-btn {
+      display: flex; align-items: center; gap: 9px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 13px 20px; border-radius: 50px;
+      color: var(--text); text-decoration: none;
+      font-weight: 500; font-size: 0.9rem;
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    .social-btn:hover {
+      border-color: var(--cyan);
+      box-shadow: var(--glow);
+      transform: translateY(-4px);
+      color: var(--cyan);
+    }
+    footer {
+      padding: 28px 5%;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      letter-spacing: 0.5px;
+    }
+    footer strong {
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .ai-toggle {
+      position: fixed; bottom: 26px; right: 26px;
+      width: 58px; height: 58px;
+      background: linear-gradient(135deg, #00f5ff, #a855f7);
+      border-radius: 50%; border: none;
+      cursor: none; z-index: 900;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 28px rgba(0, 245, 255, 0.4);
+      transition: transform 0.3s;
+    }
+    .ai-toggle:hover { transform: scale(1.12); }
+    .ai-chat {
+      position: fixed; bottom: 96px; right: 26px;
+      width: 350px; max-height: 460px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      backdrop-filter: blur(24px);
+      z-index: 900;
+      display: none; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+    }
+    .ai-chat.open { display: flex; }
+    .ai-header {
+      padding: 14px 18px;
+      background: linear-gradient(90deg, rgba(0,245,255,0.12), rgba(168,85,247,0.12));
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .ai-header h4 { font-size: 0.92rem; font-weight: 600; }
+    .ai-close {
+      background: none; border: none; color: var(--muted);
+      font-size: 1.3rem; cursor: none;
+    }
+    .ai-messages {
+      flex: 1; overflow-y: auto; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .ai-msg {
+      max-width: 88%; padding: 10px 13px;
+      border-radius: 14px; font-size: 0.86rem; line-height: 1.5;
+    }
+    .ai-msg.bot {
+      background: rgba(0, 245, 255, 0.1);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .ai-msg.user {
+      background: rgba(168, 85, 247, 0.18);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .ai-input-area {
+      display: flex; gap: 8px; padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .ai-input-area input {
+      flex: 1; padding: 10px 14px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 50px; color: var(--text);
+      outline: none; font-size: 0.88rem;
+    }
+    .ai-input-area button {
+      background: linear-gradient(135deg, #00f5ff, #a855f7);
+      border: none; border-radius: 50%;
+      width: 38px; height: 38px;
+      cursor: none; color: #030308; font-weight: 700;
+    }
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      width: 100%; max-width: 400px;
+      padding: 34px 30px; position: relative;
+    }
+    .modal h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem; margin-bottom: 22px;
+      text-align: center;
+    }
+    .modal .close-modal {
+      position: absolute; top: 14px; right: 18px;
+      background: none; border: none;
+      color: var(--muted); font-size: 1.4rem; cursor: none;
+    }
+    .tabs {
+      display: flex; gap: 8px; margin-bottom: 22px;
+    }
+    .tab-btn {
+      flex: 1; padding: 10px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 12px; color: var(--muted);
+      cursor: none; font-weight: 500; font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    .tab-btn.active {
+      background: rgba(0, 245, 255, 0.12);
+      border-color: var(--cyan); color: var(--cyan);
+    }
+    .admin-panel {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 5000;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .admin-panel.open {
+      display: flex;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .admin-sidebar {
+      width: 240px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 24px 0;
+      flex-shrink: 0;
+    }
+    .admin-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800; font-size: 1.15rem;
+      padding: 0 24px 28px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .admin-nav { flex: 1; }
+    .admin-nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 24px;
+      color: var(--muted); cursor: none;
+      font-size: 0.92rem; font-weight: 500;
+      transition: 0.25s; border-left: 3px solid transparent;
+    }
+    .admin-nav-item:hover, .admin-nav-item.active {
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--cyan);
+      border-left-color: var(--cyan);
+    }
+    .admin-main {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .admin-topbar {
+      padding: 16px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+      flex-shrink: 0;
+    }
+    .admin-topbar h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+    }
+    .admin-body {
+      flex: 1; overflow-y: auto;
+      padding: 28px;
+    }
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px; margin-bottom: 32px;
+    }
+    .admin-stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+      display: flex; align-items: center; gap: 16px;
+      transition: 0.3s;
+    }
+    .admin-stat:hover { border-color: var(--cyan); box-shadow: var(--glow); }
+    .admin-stat-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      background: rgba(0, 245, 255, 0.1);
+    }
+    .admin-stat .num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.7rem; font-weight: 800; color: var(--cyan);
+    }
+    .admin-stat .label { font-size: 0.8rem; color: var(--muted); }
+    .admin-section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem; margin-bottom: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .request-list {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .request-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 22px;
+      transition: 0.3s;
+    }
+    .request-item:hover {
+      border-color: rgba(0, 245, 255, 0.35);
+      box-shadow: 0 8px 25px rgba(0, 245, 255, 0.08);
+    }
+    .request-item-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
+    }
+    .request-item-header h4 { font-size: 1.05rem; font-weight: 600; }
+    .request-status {
+      font-size: 0.72rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 50px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-new { background: rgba(0, 245, 255, 0.15); color: var(--cyan); }
+    .status-progress { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+    .status-done { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+    .request-meta {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      font-size: 0.82rem; color: var(--muted); margin-bottom: 12px;
+    }
+    .request-meta span { display: flex; align-items: center; gap: 5px; }
+    .request-features {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    }
+    .request-features .tag { font-size: 0.7rem; }
+    .request-actions {
+      display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .req-btn {
+      padding: 7px 14px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--text);
+      font-size: 0.78rem; cursor: none; font-weight: 500;
+      transition: 0.25s;
+    }
+    .req-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .req-btn.danger:hover { border-color: #ef4444; color: #ef4444; }
+    .admin-table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .admin-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .admin-table th, .admin-table td {
+      padding: 13px 16px; text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .admin-table th {
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--cyan); font-weight: 600; font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(0, 245, 255, 0.03); }
+    .empty-state {
+      text-align: center; padding: 50px 20px;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.5; }
+    .mobile-menu {
+      position: fixed; top: 0; right: -100%;
+      width: 270px; height: 100%;
+      background: var(--bg2);
+      border-left: 1px solid var(--border);
+      z-index: 1500;
+      padding: 80px 28px 40px;
+      transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+      display: flex; flex-direction: column; gap: 22px;
+    }
+    .mobile-menu.open { right: 0; }
+    .mobile-menu a {
+      color: var(--text); text-decoration: none;
+      font-size: 1.08rem; font-weight: 500;
+    }
+    .mobile-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 1400; display: none;
+    }
+    .mobile-overlay.open { display: block; }
+    @media (max-width: 980px) {
+      .hero { flex-direction: column; text-align: center; padding-top: 110px; }
+      .hero-content { max-width: 100%; }
+      .hero-desc { margin-left: auto; margin-right: auto; }
+      .hero-btns { justify-content: center; }
+      .hero-image { width: min(300px, 70vw); margin-top: 20px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-photos { height: 360px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .form-row { grid-template-columns: 1fr; }
+      .admin-sidebar { display: none; }
+      .ai-chat { width: calc(100% - 28px); right: 14px; }
+    }
+    @media (max-width: 560px) {
+      .stats { grid-template-columns: 1fr; }
+      .request-card { padding: 28px 20px; }
+      .admin-body { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Supabase connected: lmfnintujppinoihivvf
+    Required table SQL (run in Supabase SQL Editor):
+
+    create table if not exists public.site_requests (
+      id text primary key,
+      name text not null,
+      contact text not null,
+      type text,
+      budget text,
+      features jsonb default '[]',
+      details text,
+      logo text,
+      status text default 'new',
+      created_at timestamptz default now()
+    );
+
+    -- Allow insert from anon (public form)
+    alter table public.site_requests enable row level security;
+    create policy "Anyone can insert requests" on public.site_requests for insert with check (true);
+    create policy "Anyone can read requests" on public.site_requests for select using (true);
+    create policy "Anyone can update requests" on public.site_requests for update using (true);
+    create policy "Anyone can delete requests" on public.site_requests for delete using (true);
+  -->
+
+  <div id="intro">
+    <div class="intro-logo">GOURAB BRO</div>
+    <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+    <div class="intro-text">Loading Premium Experience</div>
+  </div>
+
+  <div class="custom-cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+  <canvas id="canvas-bg"></canvas>
+  <div class="noise"></div>
+
+  <nav>
+    <div class="logo">GOURAB.BRO</div>
+    <ul class="nav-links">
+      <li><a href="#home" class="active" data-i18n="nav_home">Home</a></li>
+      <li><a href="#about" data-i18n="nav_about">About</a></li>
+      <li><a href="#skills" data-i18n="nav_skills">Skills</a></li>
+      <li><a href="#services" data-i18n="nav_services">Services</a></li>
+      <li><a href="#projects" data-i18n="nav_projects">Projects</a></li>
+      <li><a href="#request" data-i18n="nav_request">Request</a></li>
+      <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-btn" id="langBtn" title="Language">EN</button>
+      <button class="theme-btn" id="themeBtn">🌓</button>
+      <button class="auth-btn" id="authBtn">Login</button>
+      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home" data-i18n="nav_home">Home</a>
+    <a href="#about" data-i18n="nav_about">About</a>
+    <a href="#skills" data-i18n="nav_skills">Skills</a>
+    <a href="#services" data-i18n="nav_services">Services</a>
+    <a href="#projects" data-i18n="nav_projects">Projects</a>
+    <a href="#request" data-i18n="nav_request">Request</a>
+    <a href="#contact" data-i18n="nav_contact">Contact</a>
+    <button class="auth-btn" id="authBtnMobile" style="margin-top:18px;width:100%;">Login / Register</button>
+  </div>
+
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        <span data-i18n="hero_badge">Crafting Premium Digital Experiences</span>
+      </div>
+      <h1 data-i18n="hero_title">Hi, I'm <span>Gourab Bro</span></h1>
+      <p class="hero-role" data-i18n="hero_role">Full Stack Developer • Next.js • TypeScript • AI</p>
+      <p class="hero-desc" data-i18n="hero_desc">
+        I turn ideas into reality with code. Every pixel, every animation, every feature is crafted for a premium experience. From your concept to a live website — I handle the entire journey.
+      </p>
+      <div class="hero-btns">
+        <a href="#request" class="btn-primary" data-i18n="hero_btn1">Request a Website →</a>
+        <a href="#projects" class="btn-secondary" data-i18n="hero_btn2">View Work</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="hero-img-glow"></div>
+      <div class="hero-img-wrapper">
+        <img src="https://i.postimg.cc/wjNKn4My/IMG-0228.avif" alt="Gourab Bro" />
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2 class="section-title" data-i18n="about_title">About <span>Me</span></h2>
+    <p class="section-sub" data-i18n="about_sub">My story, my passion, my craft</p>
+    <div class="about-grid">
+      <div class="about-photos">
+        <img src="https://i.postimg.cc/wjNKn4My/IMG-0228.avif" alt="Gourab" />
+        <img src="https://i.postimg.cc/VNCzzLN0/IMG-0230.avif" alt="Gourab 2" />
+        <img src="https://i.postimg.cc/YSWttqSW/IMG-0235-1.avif" alt="Gourab 3" />
+      </div>
+      <div class="about-text">
+        <h3 data-i18n="about_h3">Gourab Bro — Full Stack Developer</h3>
+        <p>
+          I am Gourab Bro — a Full Stack Developer who doesn't just write code,
+          but crafts digital experiences. In every project I blend modern technology,
+          beautiful design, and real-world usability.
+        </p>
+        <p>
+          My product <strong>A-Tuls</strong> is more than a tool collection — it's a full ecosystem.
+          From email utilities to Personal Vault and AI-powered generators,
+          18+ tools under one roof with a secure dashboard and smart access system.
+        </p>
+        <p>
+          3D animation, glassmorphism, custom cursor, AI assistant,
+          premium Admin Panel — I bring all of these together to build websites
+          that people don't just use, they fall in love with.
+        </p>
+        <div class="stats">
+          <div class="stat-card">
+            <div class="num">18+</div>
+            <div class="label" data-i18n="stat1">Tools Built</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">3+</div>
+            <div class="label" data-i18n="stat2">Years Exp</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">100%</div>
+            <div class="label" data-i18n="stat3">Passion</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2 class="section-title" data-i18n="skills_title">Tech <span>Stack</span></h2>
+    <p class="section-sub" data-i18n="skills_sub">Modern technologies I master and ship with</p>
+    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">⚛️</div>
+        <div class="skill-name">React / Next.js</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_react">Server components, App Router, SSR/SSG, API routes — production-ready React apps.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">📘</div>
+        <div class="skill-name">TypeScript</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_ts">Type-safe codebases that scale. Interfaces, generics, strict mode for zero-runtime surprises.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🎨</div>
+        <div class="skill-name">Tailwind CSS</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_tw">Utility-first styling, custom design systems, responsive & dark mode out of the box.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🟢</div>
+        <div class="skill-name">Node.js / Express</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_node">REST APIs, authentication, middleware, real-time with WebSockets, file handling.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🍃</div>
+        <div class="skill-name">MongoDB / Supabase</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_db">NoSQL & SQL databases, schemas, indexes, real-time subscriptions, RLS policies.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🔥</div>
+        <div class="skill-name">Firebase</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_fb">Auth, Firestore, Storage, Cloud Functions — full backend without managing servers.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🤖</div>
+        <div class="skill-name">AI / OpenAI</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_ai">Chatbots, content generation, embeddings, custom AI assistants inside your product.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-name">Three.js / 3D</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_3d">Interactive 3D scenes, particles, WebGL experiences that make portfolios unforgettable.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">📱</div>
+        <div class="skill-name">React Native</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_rn">Cross-platform mobile apps with native feel, shared logic with web when possible.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">⚡</div>
+        <div class="skill-name">GSAP / Framer</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_gsap">Scroll-driven animations, micro-interactions, page transitions that feel premium.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🔐</div>
+        <div class="skill-name">Auth & Security</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_auth">JWT, OAuth, role-based access, admin panels, secure API design.</p>
+      </div>
+      <div class="skill-card" style="text-align:left;padding:24px;">
+        <div class="skill-icon">🚀</div>
+        <div class="skill-name">Deploy & DevOps</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:8px;line-height:1.5;" data-i18n="skill_deploy">Vercel, Netlify, Docker, CI/CD — ship fast and keep it running.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES / WHAT I CAN DO -->
+  <section id="services">
+    <h2 class="section-title" data-i18n="services_title">What I <span>Can Do</span></h2>
+    <p class="section-sub" data-i18n="services_sub">End-to-end services to turn your idea into a live product</p>
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-body" style="padding:28px;">
+          <div style="font-size:2rem;margin-bottom:12px;">🌐</div>
+          <h3 data-i18n="svc1_title">Full Website Development</h3>
+          <p data-i18n="svc1_desc">Portfolio, business, landing, blog, e-commerce — fully responsive, SEO-ready, and blazing fast.</p>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-body" style="padding:28px;">
+          <div style="font-size:2rem;margin-bottom:12px;">🎛️</div>
+          <h3 data-i18n="svc2_title">Admin Dashboard & SaaS</h3>
+          <p data-i18n="svc2_desc">Custom admin panels, user management, analytics, role-based access, and subscription systems.</p>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-body" style="padding:28px;">
+          <div style="font-size:2rem;margin-bottom:12px;">🤖</div>
+          <h3 data-i18n="svc3_title">AI Integration</h3>
+          <p data-i18n="svc3_desc">Chatbots, smart assistants, content tools, and OpenAI-powered features inside your product.</p>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-body" style="padding:28px;">
+          <div style="font-size:2rem;margin-bottom:12px;">✨</div>
+          <h3 data-i18n="svc4_title">UI / UX & 3D Experience</h3>
+          <p data-i18n="svc4_desc">Futuristic interfaces, glassmorphism, 3D scenes, custom cursors, and motion design that impresses.</p>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-body" style="padding:28px;">
+          <div style="font-size:2rem;margin-bottom:12px;">🔐</div>
+          <h3 data-i18n="svc5_title">Auth & Database</h3>
+          <p data-i18n="svc5_desc">Login/Register, Supabase/Firebase/MongoDB, secure APIs, and real-time data sync.</p>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-body" style="padding:28px;">
+          <div style="font-size:2rem;margin-bottom:12px;">📱</div>
+          <h3 data-i18n="svc6_title">Mobile & PWA</h3>
+          <p data-i18n="svc6_desc">Progressive web apps and React Native apps that work offline and feel native.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<section id="projects">
+    <h2 class="section-title" data-i18n="proj_title">Featured <span>Projects</span></h2>
+    <p class="section-sub" data-i18n="proj_sub">Projects that define my identity</p>
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-img">
+          <img src="https://i.postimg.cc/9FLmpnSg/Screenshot-20261031-093651.jpg" alt="A-Tuls" />
+        </div>
+        <div class="project-body">
+          <h3>A-Tuls — Smart Tools</h3>
+          <p>১৮+ স্মার্ট টুলস সহ কমিউনিটি ড্যাশবোর্ড। Email utilities, Vault, Generators, AI features।</p>
+          <div class="project-tags">
+            <span class="tag">Next.js</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">Dashboard</span>
+          </div>
+          <div class="project-links">
+            <a href="https://a-tuls.vercel.app/" target="_blank">Live Demo →</a>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-img">
+          <img src="https://i.postimg.cc/Wb5NnHKh/Screenshot-20261031-093658.jpg" alt="Dashboard" />
+        </div>
+        <div class="project-body">
+          <h3>A-Tuls Dashboard</h3>
+          <p>Secure membership, API code access, Weather card, AI Helper chatbot সহ সম্পূর্ণ সিস্টেম।</p>
+          <div class="project-tags">
+            <span class="tag">Auth</span>
+            <span class="tag">API</span>
+            <span class="tag">AI Chat</span>
+          </div>
+          <div class="project-links">
+            <a href="https://a-tuls.vercel.app/" target="_blank">Explore →</a>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-img" style="background:linear-gradient(135deg,#1e1b4b,#0f172a);">
+          <span style="font-size:3.2rem;">🌌</span>
+        </div>
+        <div class="project-body">
+          <h3>This Portfolio</h3>
+          <p>Futuristic 3D Portfolio with Three.js, GSAP, AI Assistant, Dark/Light mode ও Premium Admin Panel।</p>
+          <div class="project-tags">
+            <span class="tag">Three.js</span>
+            <span class="tag">GSAP</span>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="project-links">
+            <a href="#">You are here ✨</a>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-img">
+          <img src="https://i.postimg.cc/XvCnn7vG/IMG-0250.avif" alt="More Work" style="object-fit:cover;" />
+        </div>
+        <div class="project-body">
+          <h3>Custom Client Work</h3>
+          <p>বিভিন্ন ক্লায়েন্টের জন্য Portfolio, Business Site, Dashboard ও Tool-based Application তৈরি।</p>
+          <div class="project-tags">
+            <span class="tag">Custom</span>
+            <span class="tag">Full Stack</span>
+          </div>
+          <div class="project-links">
+            <a href="#request">Request Yours →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="request" class="request-section">
+    <h2 class="section-title" data-i18n="req_title">Request a <span>Website</span></h2>
+    <p class="section-sub" data-i18n="req_sub">Tell me about your dream website. Logo, features, budget — send everything in one place.</p>
+    <div class="request-card">
+      <h3>আপনার ভিশনকে ওয়েবে আনুন</h3>
+      <p class="sub">ধরন · ফিচার · লোগো · বাজেট — সব এক জায়গায়</p>
+      <form id="requestForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>আপনার নাম *</label>
+            <input type="text" id="reqName" required placeholder="Full Name" />
+          </div>
+          <div class="form-group">
+            <label>ইমেইল / WhatsApp *</label>
+            <input type="text" id="reqContact" required placeholder="email or 01XXXXXXXXX" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>সাইটের ধরন *</label>
+            <select id="reqType" required>
+              <option value="">সিলেক্ট করুন</option>
+              <option value="Portfolio">Portfolio Website</option>
+              <option value="Business">Business / Company Site</option>
+              <option value="E-commerce">E-commerce Store</option>
+              <option value="Dashboard">Admin Dashboard / SaaS</option>
+              <option value="Landing">Landing Page</option>
+              <option value="Blog">Blog / News Site</option>
+              <option value="Tool">Tool / Utility App</option>
+              <option value="Custom">Custom (নিজে বলব)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>বাজেট রেঞ্জ</label>
+            <select id="reqBudget">
+              <option value="">সিলেক্ট করুন</option>
+              <option value="5k-15k">৳5,000 – ৳15,000</option>
+              <option value="15k-30k">৳15,000 – ৳30,000</option>
+              <option value="30k-50k">৳30,000 – ৳50,000</option>
+              <option value="50k+">৳50,000+</option>
+              <option value="Discuss">আলোচনা করে ঠিক করব</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>কোন কোন ফিচার চান?</label>
+          <div class="checkbox-group" id="featureGroup">
+            <label class="checkbox-item"><input type="checkbox" value="Login System" /> Login / Register</label>
+            <label class="checkbox-item"><input type="checkbox" value="Admin Panel" /> Admin Panel</label>
+            <label class="checkbox-item"><input type="checkbox" value="Dark/Light Mode" /> Dark / Light Mode</label>
+            <label class="checkbox-item"><input type="checkbox" value="3D Animation" /> 3D Animation</label>
+            <label class="checkbox-item"><input type="checkbox" value="AI Chat" /> AI Chat Assistant</label>
+            <label class="checkbox-item"><input type="checkbox" value="Payment Gateway" /> Payment Gateway</label>
+            <label class="checkbox-item"><input type="checkbox" value="Database" /> Database</label>
+            <label class="checkbox-item"><input type="checkbox" value="Mobile App" /> Mobile App</label>
+            <label class="checkbox-item"><input type="checkbox" value="SEO" /> SEO Optimized</label>
+            <label class="checkbox-item"><input type="checkbox" value="Multi Language" /> Multi Language</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>লোগো আপলোড (ঐচ্ছিক)</label>
+          <div class="logo-upload" id="logoUploadArea">
+            <div>📁 ক্লিক করে লোগো সিলেক্ট করুন<br><small style="color:var(--muted)">PNG, JPG, SVG (max 2MB)</small></div>
+            <input type="file" id="logoInput" accept="image/*" />
+            <img class="logo-preview" id="logoPreview" alt="Logo preview" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>অতিরিক্ত বিবরণ / রিকোয়ারমেন্ট</label>
+          <textarea id="reqDetails" placeholder="সাইটের রঙ, স্টাইল, পেজ সংখ্যা, বিশেষ ফিচার বা যেকোনো কথা লিখুন..."></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:8px;">
+          রিকোয়েস্ট পাঠান → Admin-এ যাবে
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2 class="section-title" data-i18n="contact_title">Let's <span>Connect</span></h2>
+    <p class="section-sub" data-i18n="contact_sub">Reach me in one click</p>
+    <div class="social-grid">
+      <a class="social-btn" href="https://www.facebook.com/share/14v4ZvLXJtC/" target="_blank">📘 Facebook</a>
+      <a class="social-btn" href="https://www.tiktok.com/@gourab123456" target="_blank">🎵 TikTok</a>
+      <a class="social-btn" href="https://wa.me/8801336489062" target="_blank">💬 WhatsApp</a>
+      <a class="social-btn" href="https://chat.whatsapp.com/HfgpeNj7gfY1ubnEsQtEd8" target="_blank">👥 Community</a>
+      <a class="social-btn" href="https://www.instagram.com/apurbomondal123" target="_blank">📸 Instagram</a>
+      <a class="social-btn" href="https://t.me/+8801336489062" target="_blank">✈️ Telegram</a>
+    </div>
+  </section>
+
+  <footer>
+    <span data-i18n="footer">Developed by</span> <strong>Gourab Bro</strong>
+  </footer>
+
+  <button class="ai-toggle" id="aiToggle">🤖</button>
+  <div class="ai-chat" id="aiChat">
+    <div class="ai-header">
+      <h4>🤖 Gourab AI Assistant</h4>
+      <button class="ai-close" id="aiClose">×</button>
+    </div>
+    <div class="ai-messages" id="aiMessages">
+      <div class="ai-msg bot">হ্যালো! আমি Gourab-এর AI Assistant 🤖<br>সাইট রিকোয়েস্ট, স্কিল, প্রজেক্ট বা কন্টাক্ট জানতে চাইলে বলুন!</div>
+    </div>
+    <div class="ai-input-area">
+      <input type="text" id="aiInput" placeholder="মেসেজ লিখুন..." />
+      <button id="aiSend">➤</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <button class="close-modal" id="closeAuth">×</button>
+      <h2 id="authTitle">Welcome Back</h2>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="login">Login</button>
+        <button class="tab-btn" data-tab="register">Register</button>
+      </div>
+      <form id="authForm">
+        <div class="form-group" id="nameGroup" style="display:none;">
+          <label>Full Name</label>
+          <input type="text" id="authName" placeholder="Your Name" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="authEmail" required placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPass" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="authSubmit">Login</button>
+      </form>
+
+    </div>
+  </div>
+
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-sidebar">
+      <div class="admin-logo" style="display:flex;align-items:center;gap:10px;">
+        <span style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#00f5ff,#a855f7);display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:#000;font-weight:900;">G</span>
+        GOURAB ADMIN
+      </div>
+      <div class="admin-nav">
+        <div class="admin-nav-item active" data-view="dashboard"><span style="font-size:1.15rem">◈</span> Dashboard</div>
+        <div class="admin-nav-item" data-view="requests"><span style="font-size:1.15rem">◉</span> Requests</div>
+        <div class="admin-nav-item" data-view="users"><span style="font-size:1.15rem">◎</span> Users</div>
+        <div class="admin-nav-item" data-view="messages"><span style="font-size:1.15rem">◇</span> Messages</div>
+      </div>
+      <div style="padding:16px 24px;">
+        <button class="auth-btn" id="logoutBtn" style="width:100%;">Logout</button>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <h2 id="adminViewTitle">Dashboard</h2>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span id="adminUserName" style="color:var(--cyan);font-weight:600;"></span>
+          <button class="auth-btn" id="closeAdmin">← Back to Site</button>
+        </div>
+      </div>
+      <div class="admin-body" id="adminBody"></div>
+    </div>
+  </div>
+
+  <script>
+
+    // ========== SUPABASE ==========
+    const SUPABASE_URL = 'https://lmfnintujppinoihivvf.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_jh4eJXmNz-cSZ-8MEIZ1Qg_2U0I5TJC';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+    // Force hide intro - robust
+    (function hideIntro() {
+      const intro = document.getElementById('intro');
+      if (!intro) return;
+      setTimeout(function() {
+        intro.classList.add('hide');
+        setTimeout(function() { intro.style.display = 'none'; }, 900);
+      }, 2200);
+      // Fallback: force hide after 4s no matter what
+      setTimeout(function() {
+        intro.style.opacity = '0';
+        intro.style.visibility = 'hidden';
+        intro.style.display = 'none';
+      }, 4000);
+    })();
+
+
+    const cursor = document.getElementById('cursor');
+    const cursorDot = document.getElementById('cursorDot');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      cursorDot.style.left = e.clientX + 'px';
+      cursorDot.style.top = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .skill-card, .project-card, .social-btn, .checkbox-item, .admin-nav-item, .req-btn').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    const canvas = document.getElementById('canvas-bg');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const particlesGeom = new THREE.BufferGeometry();
+    const count = 1600;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 42;
+      positions[i+1] = (Math.random() - 0.5) * 42;
+      positions[i+2] = (Math.random() - 0.5) * 42;
+      colors[i] = 0.3 + Math.random() * 0.7;
+      colors[i+1] = 0.5 + Math.random() * 0.5;
+      colors[i+2] = 1;
+    }
+    particlesGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particlesGeom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const particles = new THREE.Points(particlesGeom, new THREE.PointsMaterial({
+      size: 0.055, vertexColors: true, transparent: true, opacity: 0.75
+    }));
+    scene.add(particles);
+
+    const shapes = [];
+    const geoms = [new THREE.IcosahedronGeometry(0.55, 0), new THREE.OctahedronGeometry(0.45, 0), new THREE.TetrahedronGeometry(0.5, 0)];
+    for (let i = 0; i < 9; i++) {
+      const mat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(0.55 + Math.random() * 0.15, 0.85, 0.55),
+        wireframe: true, transparent: true, opacity: 0.35
+      });
+      const mesh = new THREE.Mesh(geoms[i % 3], mat);
+      mesh.position.set((Math.random()-0.5)*22, (Math.random()-0.5)*16, (Math.random()-0.5)*16 - 4);
+      mesh.userData = { speed: 0.0015 + Math.random()*0.003, rot: 0.008 + Math.random()*0.015 };
+      scene.add(mesh);
+      shapes.push(mesh);
+    }
+    camera.position.z = 8;
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+      particles.rotation.y += 0.0007;
+      particles.rotation.x += 0.00025;
+      shapes.forEach(s => {
+        s.rotation.x += s.userData.rot;
+        s.rotation.y += s.userData.rot * 0.6;
+        s.position.y += Math.sin(Date.now() * s.userData.speed) * 0.0018;
+      });
+      renderer.render(scene, camera);
+    }
+    animate3D();
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    document.addEventListener('mousemove', e => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      camera.position.x += (x * 0.4 - camera.position.x) * 0.04;
+      camera.position.y += (-y * 0.25 - camera.position.y) * 0.04;
+    });
+
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+      localStorage.setItem('theme', isLight ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'light') document.documentElement.setAttribute('data-theme', 'light');
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    hamburger.addEventListener('click', () => { mobileMenu.classList.toggle('open'); mobileOverlay.classList.toggle('open'); });
+    mobileOverlay.addEventListener('click', () => { mobileMenu.classList.remove('open'); mobileOverlay.classList.remove('open'); });
+    document.querySelectorAll('.mobile-menu a').forEach(a => a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open'); mobileOverlay.classList.remove('open');
+    }));
+
+    document.querySelectorAll('.checkbox-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const cb = item.querySelector('input');
+        cb.checked = !cb.checked;
+        item.classList.toggle('active', cb.checked);
+      });
+    });
+
+    const logoArea = document.getElementById('logoUploadArea');
+    const logoInput = document.getElementById('logoInput');
+    const logoPreview = document.getElementById('logoPreview');
+    let logoData = null;
+    logoArea.addEventListener('click', () => logoInput.click());
+    logoInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert('Max 2MB'); return; }
+      const reader = new FileReader();
+      reader.onload = ev => {
+        logoData = ev.target.result;
+        logoPreview.src = logoData;
+        logoPreview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('requestForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const features = [...document.querySelectorAll('#featureGroup input:checked')].map(c => c.value);
+      const req = {
+        id: 'REQ-' + Date.now().toString(36).toUpperCase(),
+        name: document.getElementById('reqName').value.trim(),
+        contact: document.getElementById('reqContact').value.trim(),
+        type: document.getElementById('reqType').value,
+        budget: document.getElementById('reqBudget').value || 'Not specified',
+        features,
+        details: document.getElementById('reqDetails').value.trim(),
+        logo: logoData,
+        status: 'new',
+        date: new Date().toISOString()
+      };
+            // Save to Supabase + localStorage fallback
+      (async function() {
+        try {
+          const { error } = await sb.from('site_requests').insert([{
+            id: req.id,
+            name: req.name,
+            contact: req.contact,
+            type: req.type,
+            budget: req.budget,
+            features: req.features,
+            details: req.details,
+            logo: req.logo,
+            status: req.status,
+            created_at: req.date
+          }]);
+          if (error) throw error;
+        } catch (err) {
+          console.warn('Supabase save failed, using localStorage:', err.message || err);
+        }
+        let requests = JSON.parse(localStorage.getItem('siteRequests') || '[]');
+        requests.unshift(req);
+        localStorage.setItem('siteRequests', JSON.stringify(requests));
+        alert('✅ Request sent successfully!\nID: ' + req.id);
+      })();
+      e.target.reset();
+      logoData = null;
+      logoPreview.style.display = 'none';
+      document.querySelectorAll('.checkbox-item').forEach(i => i.classList.remove('active'));
+    });
+
+    const aiToggle = document.getElementById('aiToggle');
+    const aiChat = document.getElementById('aiChat');
+    const aiMessages = document.getElementById('aiMessages');
+    const aiInput = document.getElementById('aiInput');
+    const replies = {
+      default: "ধন্যবাদ! আরও জানতে চাইলে বলুন। আমি স্কিল, প্রজেক্ট, রিকোয়েস্ট প্রসেস বা কন্টাক্ট ইনফো দিতে পারি।",
+      skills: "Gourab Next.js, TypeScript, Tailwind, Node.js, MongoDB, Firebase, Three.js, AI Integration এ দক্ষ।",
+      project: "সেরা প্রজেক্ট A-Tuls (a-tuls.vercel.app) — ১৮+ স্মার্ট টুলস সহ।",
+      contact: "WhatsApp: 01336-489062 | Facebook, Instagram, TikTok, Telegram — Contact সেকশনে সব লিংক আছে।",
+      request: "Request সেকশনে গিয়ে সাইটের ধরন, ফিচার, লোগো ও বাজেট সিলেক্ট করে সাবমিট করুন। সব রিকোয়েস্ট Admin-এর কাছে যায়।",
+      hello: "হ্যালো! 👋 কেমন আছেন? কিভাবে সাহায্য করতে পারি?"
+    };
+    function getReply(msg) {
+      const m = msg.toLowerCase();
+      if (/skill|স্কিল|tech/.test(m)) return replies.skills;
+      if (/project|প্রজেক্ট|a-tuls/.test(m)) return replies.project;
+      if (/contact|whatsapp|কন্টাক্ট|নম্বর/.test(m)) return replies.contact;
+      if (/request|রিকোয়েস্ট|সাইট বান|order/.test(m)) return replies.request;
+      if (/hello|hi|হ্যালো|হাই/.test(m)) return replies.hello;
+      return replies.default;
+    }
+    function addMsg(text, type) {
+      const d = document.createElement('div');
+      d.className = 'ai-msg ' + type;
+      d.innerHTML = text;
+      aiMessages.appendChild(d);
+      aiMessages.scrollTop = aiMessages.scrollHeight;
+    }
+    aiToggle.addEventListener('click', () => aiChat.classList.toggle('open'));
+    document.getElementById('aiClose').addEventListener('click', () => aiChat.classList.remove('open'));
+    document.getElementById('aiSend').addEventListener('click', sendAI);
+    aiInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendAI(); });
+    function sendAI() {
+      const t = aiInput.value.trim();
+      if (!t) return;
+      addMsg(t, 'user');
+      aiInput.value = '';
+      setTimeout(() => addMsg(getReply(t), 'bot'), 550);
+    }
+
+    let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (!localStorage.getItem('users')) {
+      localStorage.setItem('users', JSON.stringify([
+        { name: 'Gourab Admin', email: 'admin@gourab.dev', password: 'admin123', role: 'admin', joined: new Date().toISOString() }
+      ]));
+    }
+    if (!localStorage.getItem('siteRequests')) localStorage.setItem('siteRequests', JSON.stringify([]));
+    if (!localStorage.getItem('messages')) localStorage.setItem('messages', JSON.stringify([]));
+
+    const authBtn = document.getElementById('authBtn');
+    const authBtnMobile = document.getElementById('authBtnMobile');
+    const authModal = document.getElementById('authModal');
+    let authMode = 'login';
+
+    function updateAuthUI() {
+      if (currentUser) {
+        authBtn.textContent = currentUser.role === 'admin' ? '⚡ Admin' : currentUser.name.split(' ')[0];
+        authBtnMobile.textContent = currentUser.role === 'admin' ? '⚡ Admin Panel' : 'Profile';
+      } else {
+        authBtn.textContent = 'Login';
+        authBtnMobile.textContent = 'Login / Register';
+      }
+    }
+    updateAuthUI();
+
+    function openAuth() {
+      if (currentUser && currentUser.role === 'admin') { openAdmin(); return; }
+      authModal.classList.add('open');
+    }
+    authBtn.addEventListener('click', openAuth);
+    authBtnMobile.addEventListener('click', openAuth);
+    document.getElementById('closeAuth').addEventListener('click', () => authModal.classList.remove('open'));
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        authMode = btn.dataset.tab;
+        document.getElementById('authTitle').textContent = authMode === 'login' ? 'Welcome Back' : 'Create Account';
+        document.getElementById('authSubmit').textContent = authMode === 'login' ? 'Login' : 'Register';
+        document.getElementById('nameGroup').style.display = authMode === 'register' ? 'block' : 'none';
+      });
+    });
+
+    document.getElementById('authForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('authPass').value;
+      const name = document.getElementById('authName').value.trim();
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      if (authMode === 'login') {
+        const user = users.find(u => u.email === email && u.password === pass);
+        if (user) {
+          currentUser = user;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          updateAuthUI();
+          authModal.classList.remove('open');
+          if (user.role === 'admin') openAdmin();
+          else alert('Welcome ' + user.name + '!');
+        } else alert('Invalid email or password');
+      } else {
+        if (users.find(u => u.email === email)) { alert('Email already registered'); return; }
+        const newUser = { name: name || 'User', email, password: pass, role: 'user', joined: new Date().toISOString() };
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        currentUser = newUser;
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
+        updateAuthUI();
+        authModal.classList.remove('open');
+        alert('Account created! Welcome ' + newUser.name);
+      }
+    });
+
+    const adminPanel = document.getElementById('adminPanel');
+    const adminBody = document.getElementById('adminBody');
+    let currentAdminView = 'dashboard';
+
+    function openAdmin() {
+      if (!currentUser || currentUser.role !== 'admin') return;
+      document.getElementById('adminUserName').textContent = currentUser.name;
+      adminPanel.classList.add('open');
+      renderAdminView('dashboard');
+    }
+    document.getElementById('closeAdmin').addEventListener('click', () => adminPanel.classList.remove('open'));
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+      updateAuthUI();
+      adminPanel.classList.remove('open');
+    });
+
+    document.querySelectorAll('.admin-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        renderAdminView(item.dataset.view);
+      });
+    });
+
+    
+    async function loadRequestsFromDB() {
+      try {
+        const { data, error } = await sb.from('site_requests').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        if (data && data.length) {
+          // map to local shape
+          const mapped = data.map(r => ({
+            id: r.id,
+            name: r.name,
+            contact: r.contact,
+            type: r.type,
+            budget: r.budget || 'Not specified',
+            features: r.features || [],
+            details: r.details || '',
+            logo: r.logo || null,
+            status: r.status || 'new',
+            date: r.created_at || r.date
+          }));
+          localStorage.setItem('siteRequests', JSON.stringify(mapped));
+          return mapped;
+        }
+      } catch (e) {
+        console.warn('Supabase load failed:', e.message || e);
+      }
+      return JSON.parse(localStorage.getItem('siteRequests') || '[]');
+    }
+
+    async function renderAdminView(view) {
+      currentAdminView = view;
+      const titles = { dashboard: 'Dashboard', requests: 'Website Requests', users: 'Users', messages: 'Messages' };
+      document.getElementById('adminViewTitle').textContent = titles[view] || view;
+
+      const requests = await loadRequestsFromDB();
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const messages = JSON.parse(localStorage.getItem('messages') || '[]');
+
+      if (view === 'dashboard') {
+        adminBody.innerHTML = `
+          <div class="admin-stats">
+            <div class="admin-stat">
+              <div class="admin-stat-icon">📥</div>
+              <div><div class="num">${requests.length}</div><div class="label">Total Requests</div></div>
+            </div>
+            <div class="admin-stat">
+              <div class="admin-stat-icon">🆕</div>
+              <div><div class="num">${requests.filter(r => r.status === 'new').length}</div><div class="label">New Requests</div></div>
+            </div>
+            <div class="admin-stat">
+              <div class="admin-stat-icon">👥</div>
+              <div><div class="num">${users.length}</div><div class="label">Users</div></div>
+            </div>
+            <div class="admin-stat">
+              <div class="admin-stat-icon">💬</div>
+              <div><div class="num">${messages.length}</div><div class="label">Messages</div></div>
+            </div>
+          </div>
+          <div class="admin-section-title">Latest Requests</div>
+          ${renderRequestList(requests.slice(0, 5))}
+        `;
+      } else if (view === 'requests') {
+        adminBody.innerHTML = `
+          <div class="admin-section-title">
+            All Website Requests
+            <span style="font-size:0.85rem;color:var(--muted);font-family:Inter,sans-serif;">${requests.length} total</span>
+          </div>
+          ${renderRequestList(requests)}
+        `;
+      } else if (view === 'users') {
+        adminBody.innerHTML = `
+          <div class="admin-section-title">Registered Users</div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead>
+              <tbody>
+                ${users.map(u => `
+                  <tr>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td><span class="request-status ${u.role === 'admin' ? 'status-done' : 'status-new'}">${u.role}</span></td>
+                    <td>${new Date(u.joined).toLocaleDateString('bn-BD')}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else if (view === 'messages') {
+        adminBody.innerHTML = `
+          <div class="admin-section-title">Contact Messages</div>
+          ${messages.length ? `
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr></thead>
+                <tbody>
+                  ${messages.map(m => `
+                    <tr>
+                      <td>${m.name}</td>
+                      <td>${m.email}</td>
+                      <td>${m.msg.substring(0, 60)}${m.msg.length > 60 ? '...' : ''}</td>
+                      <td>${new Date(m.date).toLocaleDateString('bn-BD')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : '<div class="empty-state"><div class="icon">💬</div><p>No messages yet</p></div>'}
+        `;
+      }
+    }
+
+    function renderRequestList(list) {
+      if (!list.length) return '<div class="empty-state"><div class="icon">📥</div><p>No requests yet. Users will appear here when they submit the form.</p></div>';
+      return '<div class="request-list">' + list.map(r => {
+        const featuresHtml = (r.features && r.features.length)
+          ? '<div class="request-features">' + r.features.map(f => '<span class="tag">' + f + '</span>').join('') + '</div>'
+          : '';
+        const detailsHtml = r.details
+          ? '<p style="font-size:0.88rem;color:var(--muted);margin-bottom:8px;">' + r.details + '</p>'
+          : '';
+        const logoHtml = r.logo
+          ? '<img src="' + r.logo + '" style="max-height:50px;border-radius:8px;margin-bottom:8px;" alt="Logo" />'
+          : '';
+        return `
+        <div class="request-item" data-id="${r.id}">
+          <div class="request-item-header">
+            <h4>${r.name} — ${r.type}</h4>
+            <span class="request-status status-${r.status}">${r.status}</span>
+          </div>
+          <div class="request-meta">
+            <span>📧 ${r.contact}</span>
+            <span>💰 ${r.budget}</span>
+            <span>🆔 ${r.id}</span>
+            <span>📅 ${new Date(r.date).toLocaleString('bn-BD')}</span>
+          </div>
+          ${featuresHtml}
+          ${detailsHtml}
+          ${logoHtml}
+          <div class="request-actions">
+            <button class="req-btn" onclick="updateReqStatus('${r.id}','progress')">In Progress</button>
+            <button class="req-btn" onclick="updateReqStatus('${r.id}','done')">Mark Done</button>
+            <button class="req-btn" onclick="updateReqStatus('${r.id}','new')">Reset New</button>
+            <button class="req-btn danger" onclick="deleteReq('${r.id}')">Delete</button>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    window.updateReqStatus = async function(id, status) {
+      try {
+        await sb.from('site_requests').update({ status }).eq('id', id);
+      } catch (e) { console.warn(e); }
+      let requests = JSON.parse(localStorage.getItem('siteRequests') || '[]');
+      const idx = requests.findIndex(r => r.id === id);
+      if (idx > -1) {
+        requests[idx].status = status;
+        localStorage.setItem('siteRequests', JSON.stringify(requests));
+      }
+      renderAdminView(currentAdminView);
+    };
+    window.deleteReq = async function(id) {
+      if (!confirm('Delete this request?')) return;
+      try {
+        await sb.from('site_requests').delete().eq('id', id);
+      } catch (e) { console.warn(e); }
+      let requests = JSON.parse(localStorage.getItem('siteRequests') || '[]');
+      requests = requests.filter(r => r.id !== id);
+      localStorage.setItem('siteRequests', JSON.stringify(requests));
+      renderAdminView(currentAdminView);
+    };
+
+    const sections = document.querySelectorAll('section[id]');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => { if (pageYOffset >= s.offsetTop - 180) current = s.getAttribute('id'); });
+      document.querySelectorAll('.nav-links a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+      });
+    });
+
+    
+    // ========== i18n (English default, Bangla) ==========
+    const translations = {
+      en: {
+        nav_home: "Home", nav_about: "About", nav_skills: "Skills", nav_services: "Services",
+        nav_projects: "Projects", nav_request: "Request", nav_contact: "Contact",
+        hero_badge: "Crafting Premium Digital Experiences",
+        hero_title: "Hi, I'm <span>Gourab Bro</span>",
+        hero_role: "Full Stack Developer • Next.js • TypeScript • AI",
+        hero_desc: "I turn ideas into reality with code. Every pixel, every animation, every feature is crafted for a premium experience. From your concept to a live website — I handle the entire journey.",
+        hero_btn1: "Request a Website →", hero_btn2: "View Work",
+        about_title: "About <span>Me</span>", about_sub: "My story, my passion, my craft",
+        about_h3: "Gourab Bro — Full Stack Developer",
+        stat1: "Tools Built", stat2: "Years Exp", stat3: "Passion",
+        skills_title: "Tech <span>Stack</span>", skills_sub: "Modern technologies I master and ship with",
+        skill_react: "Server components, App Router, SSR/SSG, API routes — production-ready React apps.",
+        skill_ts: "Type-safe codebases that scale. Interfaces, generics, strict mode for zero-runtime surprises.",
+        skill_tw: "Utility-first styling, custom design systems, responsive & dark mode out of the box.",
+        skill_node: "REST APIs, authentication, middleware, real-time with WebSockets, file handling.",
+        skill_db: "NoSQL & SQL databases, schemas, indexes, real-time subscriptions, RLS policies.",
+        skill_fb: "Auth, Firestore, Storage, Cloud Functions — full backend without managing servers.",
+        skill_ai: "Chatbots, content generation, embeddings, custom AI assistants inside your product.",
+        skill_3d: "Interactive 3D scenes, particles, WebGL experiences that make portfolios unforgettable.",
+        skill_rn: "Cross-platform mobile apps with native feel, shared logic with web when possible.",
+        skill_gsap: "Scroll-driven animations, micro-interactions, page transitions that feel premium.",
+        skill_auth: "JWT, OAuth, role-based access, admin panels, secure API design.",
+        skill_deploy: "Vercel, Netlify, Docker, CI/CD — ship fast and keep it running.",
+        services_title: "What I <span>Can Do</span>", services_sub: "End-to-end services to turn your idea into a live product",
+        svc1_title: "Full Website Development", svc1_desc: "Portfolio, business, landing, blog, e-commerce — fully responsive, SEO-ready, and blazing fast.",
+        svc2_title: "Admin Dashboard & SaaS", svc2_desc: "Custom admin panels, user management, analytics, role-based access, and subscription systems.",
+        svc3_title: "AI Integration", svc3_desc: "Chatbots, smart assistants, content tools, and OpenAI-powered features inside your product.",
+        svc4_title: "UI / UX & 3D Experience", svc4_desc: "Futuristic interfaces, glassmorphism, 3D scenes, custom cursors, and motion design that impresses.",
+        svc5_title: "Auth & Database", svc5_desc: "Login/Register, Supabase/Firebase/MongoDB, secure APIs, and real-time data sync.",
+        svc6_title: "Mobile & PWA", svc6_desc: "Progressive web apps and React Native apps that work offline and feel native.",
+        proj_title: "Featured <span>Projects</span>", proj_sub: "Projects that define my identity",
+        req_title: "Request a <span>Website</span>", req_sub: "Tell me about your dream website. Logo, features, budget — send everything in one place.",
+        contact_title: "Let's <span>Connect</span>", contact_sub: "Reach me in one click",
+        footer: "Developed by"
+      },
+      bn: {
+        nav_home: "হোম", nav_about: "আমার সম্পর্কে", nav_skills: "স্কিল", nav_services: "সার্ভিস",
+        nav_projects: "প্রজেক্ট", nav_request: "রিকোয়েস্ট", nav_contact: "যোগাযোগ",
+        hero_badge: "প্রিমিয়াম ডিজিটাল এক্সপেরিয়েন্স তৈরি করি",
+        hero_title: "হ্যালো, আমি <span>Gourab Bro</span>",
+        hero_role: "Full Stack Developer • Next.js • TypeScript • AI",
+        hero_desc: "কোড দিয়ে স্বপ্ন বাস্তবায়ন করি। প্রতিটি পিক্সেল, প্রতিটি অ্যানিমেশন, প্রতিটি ফিচার — সবকিছুতেই প্রিমিয়াম অভিজ্ঞতা। আপনার আইডিয়া থেকে শুরু করে লাইভ ওয়েবসাইট পর্যন্ত পুরো যাত্রা আমি সম্পূর্ণ করি।",
+        hero_btn1: "ওয়েবসাইট রিকোয়েস্ট →", hero_btn2: "কাজ দেখুন",
+        about_title: "আমার <span>সম্পর্কে</span>", about_sub: "আমার গল্প, আমার প্যাশন, আমার কাজ",
+        about_h3: "Gourab Bro — Full Stack Developer",
+        stat1: "টুলস তৈরি", stat2: "বছরের অভিজ্ঞতা", stat3: "প্যাশন",
+        skills_title: "টেক <span>স্ট্যাক</span>", skills_sub: "যেসব আধুনিক টেকনোলজি দিয়ে আমি প্রজেক্ট ডেলিভার করি",
+        skill_react: "Server components, App Router, SSR/SSG, API routes — প্রোডাকশন-রেডি React অ্যাপ।",
+        skill_ts: "টাইপ-সেফ কোডবেস যা স্কেল করে। Interface, generic, strict mode।",
+        skill_tw: "Utility-first স্টাইলিং, কাস্টম ডিজাইন সিস্টেম, রেসপন্সিভ ও ডার্ক মোড।",
+        skill_node: "REST API, authentication, middleware, WebSocket, ফাইল হ্যান্ডলিং।",
+        skill_db: "NoSQL ও SQL ডাটাবেস, schema, index, real-time, RLS policy।",
+        skill_fb: "Auth, Firestore, Storage, Cloud Functions — সার্ভার ছাড়াই ব্যাকএন্ড।",
+        skill_ai: "চ্যাটবট, কনটেন্ট জেনারেশন, embedding, কাস্টম AI অ্যাসিস্ট্যান্ট।",
+        skill_3d: "ইন্টারঅ্যাক্টিভ ৩ডি সিন, পার্টিকেল, WebGL — অবিস্মরণীয় পোর্টফোলিও।",
+        skill_rn: "ক্রস-প্ল্যাটফর্ম মোবাইল অ্যাপ, নেটিভ ফিল, ওয়েবের সাথে শেয়ার্ড লজিক।",
+        skill_gsap: "স্ক্রল-ড্রিভেন অ্যানিমেশন, মাইক্রো-ইন্টারঅ্যাকশন, প্রিমিয়াম ট্রানজিশন।",
+        skill_auth: "JWT, OAuth, রোল-বেসড অ্যাক্সেস, অ্যাডমিন প্যানেল, সিকিউর API।",
+        skill_deploy: "Vercel, Netlify, Docker, CI/CD — দ্রুত শিপ ও স্ট্যাবল রাখা।",
+        services_title: "আমি কী <span>করতে পারি</span>", services_sub: "আইডিয়া থেকে লাইভ প্রোডাক্ট পর্যন্ত এন্ড-টু-এন্ড সার্ভিস",
+        svc1_title: "সম্পূর্ণ ওয়েবসাইট ডেভেলপমেন্ট", svc1_desc: "পোর্টফোলিও, বিজনেস, ল্যান্ডিং, ব্লগ, ই-কমার্স — রেসপন্সিভ, SEO-রেডি ও দ্রুত।",
+        svc2_title: "অ্যাডমিন ড্যাশবোর্ড ও SaaS", svc2_desc: "কাস্টম অ্যাডমিন প্যানেল, ইউজার ম্যানেজমেন্ট, অ্যানালিটিক্স, সাবস্ক্রিপশন সিস্টেম।",
+        svc3_title: "AI ইন্টিগ্রেশন", svc3_desc: "চ্যাটবট, স্মার্ট অ্যাসিস্ট্যান্ট, কনটেন্ট টুল, OpenAI-পাওয়ার্ড ফিচার।",
+        svc4_title: "UI / UX ও ৩ডি এক্সপেরিয়েন্স", svc4_desc: "ফিউচারিস্টিক ইন্টারফেস, গ্লাসমরফিজম, ৩ডি সিন, কাস্টম কার্সর, মোশন ডিজাইন।",
+        svc5_title: "অথ ও ডাটাবেস", svc5_desc: "Login/Register, Supabase/Firebase/MongoDB, সিকিউর API, রিয়েল-টাইম ডাটা।",
+        svc6_title: "মোবাইল ও PWA", svc6_desc: "Progressive web app ও React Native অ্যাপ — অফলাইনেও কাজ করে।",
+        proj_title: "ফিচার্ড <span>প্রজেক্ট</span>", proj_sub: "যেসব প্রজেক্ট আমার পরিচয় বহন করে",
+        req_title: "ওয়েবসাইট <span>রিকোয়েস্ট</span>", req_sub: "আপনার স্বপ্নের ওয়েবসাইটের বিস্তারিত দিন। লোগো, ফিচার, বাজেট — সব একসাথে পাঠান।",
+        contact_title: "যোগাযোগ <span>করুন</span>", contact_sub: "এক ক্লিকেই আমাকে খুঁজে নিন",
+        footer: "ডেভেলপড বাই"
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'en';
+    const langBtn = document.getElementById('langBtn');
+
+    function applyLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      langBtn.textContent = lang === 'en' ? 'EN' : 'বাং';
+      document.documentElement.lang = lang === 'en' ? 'en' : 'bn';
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) {
+          el.innerHTML = t[key];
+        }
+      });
+    }
+
+    langBtn.addEventListener('click', () => {
+      applyLang(currentLang === 'en' ? 'bn' : 'en');
+    });
+    applyLang(currentLang);
+
+    // Always land on homepage hash if empty
+    if (!location.hash || location.hash === '#') {
+      history.replaceState(null, '', location.pathname + '#home');
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.skill-card, .project-card, .stat-card').forEach((el, i) => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 92%' },
+        y: 36, opacity: 0, duration: 0.55, delay: (i % 6) * 0.05
+      });
+    });
+  </script>
+</body>
+</html>
